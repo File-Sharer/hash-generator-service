@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/File-Sharer/hash-generator-service/internal/pb";
+
+message HashReq {
+  string baseString = 1;
+}
+
+message HashRes {
+  bool ok = 1;
+  string hash = 2;
+}
+
+message NewUIDReq {
+  string userLogin = 1;
+}
+
+message NewUIDRes {
+  bool ok = 1;
+  string uid = 2;
+}
+
+service Hasher {
+  rpc Hash(HashReq) returns (HashRes) {}
+  rpc NewUID(NewUIDReq) returns (NewUIDRes) {}
+}
