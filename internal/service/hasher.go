@@ -22,9 +22,15 @@ func (s *HasherService) Hash(baseString string) (string, error) {
 	}
 
 	timestamp := strconv.Itoa(time.Now().Nanosecond())
-	hashBytes := hash.Sum([]byte(timestamp[:6]))
+	_, err = hash.Write([]byte(timestamp))
+	if err != nil {
+		return "", err
+	}
+
+	hashBytes := hash.Sum([]byte{})
 	hashString := hex.EncodeToString(hashBytes)
-	return hashString[:28], nil
+
+	return hashString[:32], nil
 }
 
 func (s *HasherService) NewUID(userLogin string) (string, error) {
