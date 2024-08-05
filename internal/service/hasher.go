@@ -29,7 +29,6 @@ func (s *HasherService) Hash(baseString string) (string, error) {
 
 	hashBytes := hash.Sum([]byte{})
 	hashString := hex.EncodeToString(hashBytes)
-
 	return hashString[:32], nil
 }
 
