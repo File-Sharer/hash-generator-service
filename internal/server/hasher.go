@@ -30,3 +30,21 @@ func (s *GRPCServer) NewUID(ctx context.Context, req *pb.NewUIDReq) (*pb.NewUIDR
 		Uid: hash,
 	}, nil
 }
+
+func (s *GRPCServer) NewJWT(ctx context.Context, req *pb.NewJWTReq) (*pb.NewJWTRes, error) {
+	token, err := s.services.Hasher.NewJWT(ctx, req)
+	if err != nil {
+		return &pb.NewJWTRes{Ok: false}, err
+	}
+
+	return &pb.NewJWTRes{Ok: true, Token: token}, nil
+}
+
+func (s *GRPCServer) DecodeJWT(ctx context.Context, req *pb.DecodeJWTReq) (*pb.DecodeJWTRes, error) {
+	user, err := s.services.Hasher.DecodeJWT(ctx, req)
+	if err != nil {
+		return &pb.DecodeJWTRes{Ok: false}, err
+	}
+
+	return &pb.DecodeJWTRes{Ok: true, UserId: user.ID, Role: user.Role}, nil
+}

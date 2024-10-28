@@ -8,6 +8,7 @@ import (
 	"github.com/File-Sharer/hash-generator-service/internal/config"
 	"github.com/File-Sharer/hash-generator-service/internal/server"
 	"github.com/File-Sharer/hash-generator-service/internal/service"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -17,6 +18,10 @@ func main() {
 
 	if err := initConfig(); err != nil {
 		logrus.Fatalf("error initializing config: %s", err.Error())
+	}
+
+	if err := initEnv(); err != nil {
+		logrus.Fatalf("error initializing env: %s", err.Error())
 	}
 
 	services := service.New()
@@ -45,4 +50,8 @@ func initConfig() error {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
+}
+
+func initEnv() error {
+	return godotenv.Load(".env")
 }

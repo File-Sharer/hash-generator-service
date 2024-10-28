@@ -22,7 +22,31 @@ message NewUIDRes {
   string uid = 2;
 }
 
+message NewJWTReq {
+  string secret = 1;
+  string userId = 2;
+  string role = 3;
+}
+
+message NewJWTRes {
+  bool ok = 1;
+  string token = 2;
+}
+
+message DecodeJWTReq {
+  string secret = 1;
+  string jwt = 2;
+}
+
+message DecodeJWTRes {
+  bool ok = 1;
+  string userId = 2;
+  string role = 3;
+}
+
 service Hasher {
   rpc Hash(HashReq) returns (HashRes) {}
   rpc NewUID(NewUIDReq) returns (NewUIDRes) {}
+  rpc NewJWT(NewJWTReq) returns (NewJWTRes) {}
+  rpc DecodeJWT(DecodeJWTReq) returns (DecodeJWTRes) {}
 }
