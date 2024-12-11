@@ -44,9 +44,22 @@ message DecodeJWTRes {
   string role = 3;
 }
 
+message GenerateJWTPairReq {
+  string secret = 1;
+  string userId = 2;
+  string role = 3;
+}
+
+message GenerateJWTPairRes {
+  bool ok = 1;
+  string accessToken = 2;
+  string refreshToken = 3;
+}
+
 service Hasher {
   rpc Hash(HashReq) returns (HashRes) {}
   rpc NewUID(NewUIDReq) returns (NewUIDRes) {}
   rpc NewJWT(NewJWTReq) returns (NewJWTRes) {}
   rpc DecodeJWT(DecodeJWTReq) returns (DecodeJWTRes) {}
+  rpc GenerateJWTPair(GenerateJWTPairReq) returns (GenerateJWTPairRes) {}
 }

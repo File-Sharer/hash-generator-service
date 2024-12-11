@@ -48,3 +48,12 @@ func (s *GRPCServer) DecodeJWT(ctx context.Context, req *pb.DecodeJWTReq) (*pb.D
 
 	return &pb.DecodeJWTRes{Ok: true, UserId: user.ID, Role: user.Role}, nil
 }
+
+func (s *GRPCServer) GenerateJWTPair(ctx context.Context, req *pb.GenerateJWTPairReq) (*pb.GenerateJWTPairRes, error) {
+	res, err := s.services.Hasher.GenerateJWTPair(ctx, req)
+	if err != nil {
+		return &pb.GenerateJWTPairRes{Ok: false}, err
+	}
+
+	return res, nil
+}

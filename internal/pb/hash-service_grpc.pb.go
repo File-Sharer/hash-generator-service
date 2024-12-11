@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Hasher_Hash_FullMethodName      = "/proto.Hasher/Hash"
-	Hasher_NewUID_FullMethodName    = "/proto.Hasher/NewUID"
-	Hasher_NewJWT_FullMethodName    = "/proto.Hasher/NewJWT"
-	Hasher_DecodeJWT_FullMethodName = "/proto.Hasher/DecodeJWT"
+	Hasher_Hash_FullMethodName            = "/proto.Hasher/Hash"
+	Hasher_NewUID_FullMethodName          = "/proto.Hasher/NewUID"
+	Hasher_NewJWT_FullMethodName          = "/proto.Hasher/NewJWT"
+	Hasher_DecodeJWT_FullMethodName       = "/proto.Hasher/DecodeJWT"
+	Hasher_GenerateJWTPair_FullMethodName = "/proto.Hasher/GenerateJWTPair"
 )
 
 // HasherClient is the client API for Hasher service.
@@ -33,6 +34,7 @@ type HasherClient interface {
 	NewUID(ctx context.Context, in *NewUIDReq, opts ...grpc.CallOption) (*NewUIDRes, error)
 	NewJWT(ctx context.Context, in *NewJWTReq, opts ...grpc.CallOption) (*NewJWTRes, error)
 	DecodeJWT(ctx context.Context, in *DecodeJWTReq, opts ...grpc.CallOption) (*DecodeJWTRes, error)
+	GenerateJWTPair(ctx context.Context, in *GenerateJWTPairReq, opts ...grpc.CallOption) (*GenerateJWTPairRes, error)
 }
 
 type hasherClient struct {
@@ -83,6 +85,16 @@ func (c *hasherClient) DecodeJWT(ctx context.Context, in *DecodeJWTReq, opts ...
 	return out, nil
 }
 
+func (c *hasherClient) GenerateJWTPair(ctx context.Context, in *GenerateJWTPairReq, opts ...grpc.CallOption) (*GenerateJWTPairRes, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateJWTPairRes)
+	err := c.cc.Invoke(ctx, Hasher_GenerateJWTPair_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HasherServer is the server API for Hasher service.
 // All implementations must embed UnimplementedHasherServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type HasherServer interface {
 	NewUID(context.Context, *NewUIDReq) (*NewUIDRes, error)
 	NewJWT(context.Context, *NewJWTReq) (*NewJWTRes, error)
 	DecodeJWT(context.Context, *DecodeJWTReq) (*DecodeJWTRes, error)
+	GenerateJWTPair(context.Context, *GenerateJWTPairReq) (*GenerateJWTPairRes, error)
 	mustEmbedUnimplementedHasherServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedHasherServer) NewJWT(context.Context, *NewJWTReq) (*NewJWTRes
 }
 func (UnimplementedHasherServer) DecodeJWT(context.Context, *DecodeJWTReq) (*DecodeJWTRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DecodeJWT not implemented")
+}
+func (UnimplementedHasherServer) GenerateJWTPair(context.Context, *GenerateJWTPairReq) (*GenerateJWTPairRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateJWTPair not implemented")
 }
 func (UnimplementedHasherServer) mustEmbedUnimplementedHasherServer() {}
 func (UnimplementedHasherServer) testEmbeddedByValue()                {}
@@ -206,6 +222,24 @@ func _Hasher_DecodeJWT_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Hasher_GenerateJWTPair_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateJWTPairReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HasherServer).GenerateJWTPair(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Hasher_GenerateJWTPair_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HasherServer).GenerateJWTPair(ctx, req.(*GenerateJWTPairReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Hasher_ServiceDesc is the grpc.ServiceDesc for Hasher service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var Hasher_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DecodeJWT",
 			Handler:    _Hasher_DecodeJWT_Handler,
+		},
+		{
+			MethodName: "GenerateJWTPair",
+			Handler:    _Hasher_GenerateJWTPair_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

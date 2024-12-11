@@ -61,7 +61,7 @@ func (s *HasherService) NewJWT(ctx context.Context, req *pb.NewJWTReq) (string, 
 	userRole := strings.TrimSpace(req.Role)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userID,
+		"id": userID,
 		"role": userRole,
 		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
@@ -92,7 +92,42 @@ func (s *HasherService) DecodeJWT(ctx context.Context, req *pb.DecodeJWTReq) (*m
 	}
 
 	return &model.User{
-		ID: claims["sub"].(string),
+		ID: claims["id"].(string),
 		Role: claims["role"].(string),
+	}, nil
+}
+
+func (s *HasherService) GenerateJWTPair(ctx context.Context, req *pb.GenerateJWTPairReq) (*pb.GenerateJWTPairRes, error) {
+	if req.Secret != os.Getenv("SECRET") {
+		return nil, errNoAccess
+	}
+
+	userID := strings.TrimSpace(req.UserId)
+	role := strings.TrimSpace(req.Role)
+
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id": userID,
+		"role": role,
+		"exp": time.Now().Add(time.Hour * 2).Unix(),
+	})
+	accessTokenString, err := accessToken.SignedString([]byte(os.Getenv("SECRET_JWT")))
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id": userID,
+		"role": role,
+		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
+	})
+	refreshTokenString, err := refreshToken.SignedString([]byte(os.Getenv("SECRET_JWT")))
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GenerateJWTPairRes{
+		Ok: true,
+		AccessToken: accessTokenString,
+		RefreshToken: refreshTokenString,
 	}, nil
 }
